@@ -8,9 +8,16 @@ The details of the benchmark methodology and design are described in the paper:
 > CleanML: A Benchmark for
 Joint Data Cleaning and Machine Learning [Experiments and Analysis]
 
-
-
 ## Basic Usage
+
+```shell
+python3 -m venv venv
+source venv/bin/activate
+pip install -U pip
+
+pip install -r requirements.txt
+```
+
 ### Run Experiments
 To run experiments, download and unzip the [datasets](https://www.dropbox.com/s/nerfrhbrseev928/CleanML-datasets-2020.zip?dl=0). Place it under the project home directory and execute the following command from the project home directory:
 
