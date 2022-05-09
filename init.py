@@ -25,13 +25,15 @@ def delete_missing_values(raw):
     return dirty
 
 
+# TODO: Should this use stratified sampling?
 def split(data, test_ratio, seed, max_size=None):
     """Shuffle and split data to train / test"""
-    # random shuffle 
+    # random shuffle
     np.random.seed(seed)
     N = data.shape[0]
     idx = np.random.permutation(N)
 
+    # TODO: this needs some special care to work correctly with stratified sampling
     # only use first max_size data if N > max_size
     if max_size is not None:
         N = min(N, int(max_size))
@@ -42,10 +44,10 @@ def split(data, test_ratio, seed, max_size=None):
     idx_test = idx[:test_size]
     train = data.iloc[idx_train]
     test = data.iloc[idx_test]
-    idx_train = pd.DataFrame(idx_train, columns=["index"])
-    idx_test = pd.DataFrame(idx_test, columns=["index"])
+    #idx_train = pd.DataFrame(idx_train, columns=["index"])
+    #idx_test = pd.DataFrame(idx_test, columns=["index"])
 
-    return train, test, idx_train, idx_test
+    return train, test
 
 
 def reset(dataset):
@@ -85,7 +87,7 @@ def init(dataset, test_ratio=0.3, seed=1, max_size=None):
         dirty = delete_missing_labels(raw, dataset['label'])
 
     # split dataset
-    train, test, idx_train, idx_test = split(dirty, test_ratio, seed, max_size)
+    train, test = split(dirty, test_ratio, seed, max_size)
 
     # save train / test
     save_path_pfx = utils.get_dir(dataset, 'raw', 'dirty')
@@ -95,8 +97,8 @@ def init(dataset, test_ratio=0.3, seed=1, max_size=None):
     utils.save_version(save_path_pfx, seed)
 
     # save index
-    save_path_pfx = utils.get_dir(dataset, 'raw', 'idx')
-    utils.save_dfs(idx_train, idx_test, save_path_pfx)
+    # save_path_pfx = utils.get_dir(dataset, 'raw', 'idx')
+    # utils.save_dfs(idx_train, idx_test, save_path_pfx)
 
     # save dirty
     # save_path = utils.get_dir(dataset, 'raw', 'dirty.csv')
@@ -114,7 +116,7 @@ if __name__ == '__main__':
 
     # datasets to be initialized, initialze all datasets if not specified
     datasets = [utils.get_dataset(args.dataset)] if args.dataset is not None else config.datasets
-    
+
     # raw -> dirty
     for dataset in datasets:
         if args.reset:
