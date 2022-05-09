@@ -27,13 +27,14 @@ def one_search_experiment(dataset, error_type, train_file, model, seed, n_jobs=1
     down_sample_seed, train_seed = np.random.randint(1000, size=2)
 
     # load and preprocess data
-    X_train, y_train, X_test_list, y_test_list, test_files = \
+    X_train, y_train, X_test_list, y_test_list, test_group_memberships, test_files = \
         preprocess(dataset, error_type, train_file, normalize=True, down_sample_seed=down_sample_seed)
 
     test_files = list(set(test_files).difference(set(skip_test_files)))   
 
     # train and evaluate
-    result = train_and_evaluate(X_train, y_train, X_test_list, y_test_list, test_files, model, n_jobs=n_jobs, seed=train_seed, hyperparams=hyperparams)
+    result = train_and_evaluate(X_train, y_train, X_test_list, y_test_list, test_group_memberships,
+                                test_files, model, n_jobs=n_jobs, seed=train_seed, hyperparams=hyperparams)
     return result
 
 

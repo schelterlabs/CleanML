@@ -25,13 +25,15 @@ def delete_missing_values(raw):
     return dirty
 
 
+# TODO: Should this use stratified sampling?
 def split(data, test_ratio, seed, max_size=None):
     """Shuffle and split data to train / test"""
-    # random shuffle 
+    # random shuffle
     np.random.seed(seed)
     N = data.shape[0]
     idx = np.random.permutation(N)
 
+    # TODO: this needs some special care to work correctly with stratified sampling
     # only use first max_size data if N > max_size
     if max_size is not None:
         N = min(N, int(max_size))
@@ -114,7 +116,7 @@ if __name__ == '__main__':
 
     # datasets to be initialized, initialze all datasets if not specified
     datasets = [utils.get_dataset(args.dataset)] if args.dataset is not None else config.datasets
-    
+
     # raw -> dirty
     for dataset in datasets:
         if args.reset:

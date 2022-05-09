@@ -56,7 +56,11 @@ USCensus = {
     "data_dir": "USCensus",
     "error_types": ["missing_values"],
     "label": 'Income',
-    "ml_task": "classification"
+    "ml_task": "classification",
+    "privileged_groups": {
+        "Race": " white",
+        "Sex": " male"
+    }
 }
 
 Restaurant = {

@@ -2,7 +2,7 @@
 import numpy as np
 
 from sklearn.model_selection import GridSearchCV, cross_val_score
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, confusion_matrix
 
 
 def parse_searcher(searcher):
@@ -57,7 +57,7 @@ def train(X_train, y_train, estimator, param_grid, seed=1, n_jobs=1, skip=False)
     return best_model, result
 
 
-def evaluate(best_model, X_test_list, y_test_list, test_files):
+def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_files):
     # evaluate on test sets
     result = {}
     for X_test, y_test, file in zip(X_test_list, y_test_list, test_files):
@@ -69,7 +69,27 @@ def evaluate(best_model, X_test_list, y_test_list, test_files):
             test_f1 = f1_score(y_test, y_pred, average='macro')
         else:
             test_f1 = f1_score(y_test, y_pred)
-            result[file + "_test_f1"] = test_f1  
+            result[file + "_test_f1"] = test_f1
+
+    for group in test_group_memberships.keys():
+        for X_test, y_test, file, priv_idx in zip(X_test_list, y_test_list, test_files, test_group_memberships[group]):
+
+            # Indexes for disadvantaged group
+            dis_idx = np.logical_not(priv_idx)
+            y_pred = best_model.predict(X_test)
+
+            priv_tn, priv_fp, priv_fn, priv_tp = confusion_matrix(y_test[priv_idx], y_pred[priv_idx]).ravel()
+            dis_tn, dis_fp, dis_fn, dis_tp = confusion_matrix(y_test[dis_idx], y_pred[dis_idx]).ravel()
+
+            result[file + f"__{group.lower()}_priv__tn"] = int(priv_tn)
+            result[file + f"__{group.lower()}_priv__fp"] = int(priv_fp)
+            result[file + f"__{group.lower()}_priv__fn"] = int(priv_fn)
+            result[file + f"__{group.lower()}_priv__tp"] = int(priv_tp)
+            result[file + f"__{group.lower()}_dis__tn"] = int(dis_tn)
+            result[file + f"__{group.lower()}_dis__fp"] = int(dis_fp)
+            result[file + f"__{group.lower()}_dis__fn"] = int(dis_fn)
+            result[file + f"__{group.lower()}_dis__tp"] = int(dis_tp)
+
     return result
 
 
@@ -144,7 +164,8 @@ def hyperparam_search(X_train, y_train, model, n_jobs=1, seed=1, hyperparams=Non
     return best_model, result
 
 
-def train_and_evaluate(X_train, y_train, X_test_list, y_test_list, test_files, model, n_jobs=1, seed=1, hyperparams=None):
+def train_and_evaluate(X_train, y_train, X_test_list, y_test_list, test_group_memberships,
+                       test_files, model, n_jobs=1, seed=1, hyperparams=None):
     """Search hyperparameters and evaluate
 
     Args:
@@ -158,6 +179,6 @@ def train_and_evaluate(X_train, y_train, X_test_list, y_test_list, test_files, m
         n_jobs (int): num of threads
     """
     best_model, result_train = hyperparam_search(X_train, y_train, model, n_jobs, seed, hyperparams)
-    result_test = evaluate(best_model, X_test_list, y_test_list, test_files)
+    result_test = evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_files)
     result = {**result_train, **result_test}
     return result
