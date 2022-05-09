@@ -21,7 +21,7 @@ def check_version(dataset, error_type, train_file):
         test_version = utils.get_version(test_path_pfx)
         assert(train_version == test_version)
 
-
+# CHANGES-SSC
 def load_data(dataset, train_path, test_path_list):
     """Load and split data into features and label.
 
@@ -41,7 +41,14 @@ def load_data(dataset, train_path, test_path_list):
     X_test_list = [test.loc[:, features] for test in test_list]
     y_test_list = [test.loc[:, label] for test in test_list]
 
-    return X_train, y_train, X_test_list, y_test_list  
+    test_group_memberships = {}
+    for membership_attribute, privileged_value in dataset["privileged_groups"].items():
+        test_group_memberships[membership_attribute] = [
+            np.array(test[membership_attribute] == privileged_value)
+            for test in test_list
+        ]
+
+    return X_train, y_train, X_test_list, y_test_list, test_group_memberships
 
 
 def drop_variables(X_train, X_test_list, drop_columns):
@@ -141,7 +148,7 @@ def preprocess(dataset, error_type, train_file, normalize=True, down_sample_seed
     test_path_list = [utils.get_dir(dataset, error_type, test_file + "_test.csv") for test_file in test_files]
 
     # load data
-    X_train, y_train, X_test_list, y_test_list = load_data(dataset, train_path, test_path_list)
+    X_train, y_train, X_test_list, y_test_list, test_group_memberships = load_data(dataset, train_path, test_path_list)
 
     ## preprocess data
     # drop irrelavant features
@@ -149,6 +156,7 @@ def preprocess(dataset, error_type, train_file, normalize=True, down_sample_seed
         drop_columns = dataset['drop_variables']
         drop_variables(X_train, X_test_list, drop_columns)
 
+    # CHANGES-SSC this messes up group memberships... Needs to be adjusted
     # down sample if imbalanced
     if "class_imbalance" in dataset.keys() and dataset["class_imbalance"]:
         X_train, y_train = down_sample(X_train, y_train, down_sample_seed)
@@ -171,4 +179,4 @@ def preprocess(dataset, error_type, train_file, normalize=True, down_sample_seed
         X_train = scaler.fit_transform(X_train)
         X_test_list = [scaler.transform(X_test) for X_test in X_test_list]
 
-    return X_train, y_train, X_test_list, y_test_list, test_files
+    return X_train, y_train, X_test_list, y_test_list, test_group_memberships, test_files
