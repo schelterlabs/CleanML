@@ -260,10 +260,20 @@ Credit_minor = {
     "class_imbalance":True
 }
 
+ACSIncome = {
+    "data_dir": "ACSIncome",
+    "error_types": ["missing_values"],  # TODO
+    "label": "label",
+    "categorical_variables": ["label", "COW", "SCHL", "MAR", "OCCP", "POBP", "RELP", "SEX", "RAC1P"],
+    "ml_task": "classification",
+    "class_imbalance": True,
+}
+
 # domain of dataset 
 datasets = [KDD, Credit, Airbnb, USCensus, EEG, Titanic, 
             Marketing, Sensor, Movie, Restaurant, Citation, 
             Company, University, KDD_uniform, KDD_minor, KDD_major,
             USCensus_uniform, USCensus_major, USCensus_minor,
             EEG_uniform, EEG_minor, EEG_major, Titanic_uniform, Titanic_minor, Titanic_major,
-            Marketing_uniform, Marketing_major, Marketing_minor, Credit_uniform, Credit_major, Credit_minor]
+            Marketing_uniform, Marketing_major, Marketing_minor, Credit_uniform, Credit_major, Credit_minor,
+            ACSIncome]
