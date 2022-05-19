@@ -24,6 +24,7 @@ def get_dataset(name):
         sys.exit()
     return dataset[0]
 
+
 def get_error(name):
     """Get error dict in config.py given name
 
@@ -36,17 +37,19 @@ def get_error(name):
         sys.exit()
     return error_type[0]
 
+
 def get_model(name):
     """Get model dict in config.py given name
 
     Args:
         name (string): model name
     """
-    model = [m for m in config.models if m['name'] == name ]
+    model = [m for m in config.models if m['name'] == name]
     if len(model) == 0:
         print("Model {} does not exist.".format(name))
         sys.exit()
     return model[0]
+
 
 def get_dir(dataset, folder=None, file=None, create_folder=False):
     """Get directory or path given dataset, folder name (optional) and filename (optional)
@@ -71,6 +74,7 @@ def get_dir(dataset, folder=None, file=None, create_folder=False):
     file_dir = os.path.join(folder_dir, file)
     return file_dir
 
+
 def load_df(dataset, file_path):
     """load data file into pandas dataframe and convert categorical variables to string
 
@@ -84,6 +88,7 @@ def load_df(dataset, file_path):
         for cat in categories:
             df[cat] = df[cat].astype(str).replace('nan', np.nan) 
     return df
+
 
 def load_dfs(dataset, file_path_pfx, return_version=False):
     """load train and test files into pandas dataframes 
@@ -103,6 +108,7 @@ def load_dfs(dataset, file_path_pfx, return_version=False):
     else:
         return train, test
 
+
 def save_dfs(train, test, save_path_pfx, version=None):
     """Save train and test pandas dataframes in csv file
 
@@ -118,6 +124,7 @@ def save_dfs(train, test, save_path_pfx, version=None):
     test.to_csv(test_save_path, index=False)
     if version is not None:
         save_version(save_path_pfx, version)
+
 
 def save_version(file_path_pfx, seed):
     """Save version of data in json file
@@ -135,6 +142,7 @@ def save_version(file_path_pfx, seed):
     version[file] = str(seed)
     json.dump(version, open(version_path, 'w'))
 
+
 def get_version(file_path_pfx):
     """Get version of data 
 
@@ -148,6 +156,7 @@ def get_version(file_path_pfx):
         return int(version[file])
     else:
         return None
+
 
 def remove(path):
     """Remove file or directory
@@ -170,7 +179,6 @@ def get_train_files(error_type):
     Args:
         error_type (string): missing_values/outliers/mislabel/duplicates/inconsistency
     """
-
     error_dict = [e for e in config.error_types if e["name"] == error_type][0]
     if error_type == 'missing_values':
         filenames = list(error_dict["clean_methods"].keys())
@@ -212,7 +220,8 @@ def get_train_files(error_type):
     # else:
     #     filenames = ["dirty", "clean"]
     return filenames
-    
+
+
 def get_test_files(error_type, train_file):
     """Get test files given error type and training file
        Each error has two types of files: dirty and clean (delete and impute for missing values)
@@ -235,6 +244,7 @@ def get_test_files(error_type, train_file):
             return get_train_files(error_type)
         else:
             return ["dirty", train_file]
+
 
 def check_completed(dataset, split_seed, experiment_seed):
     """Check whether all experiments for the dataset with split_seed have been completed
@@ -289,6 +299,7 @@ def load_result(dataset_name=None, parse_key=False):
 
     return result
 
+
 def load_result2019(dataset_name=None, parse_key=False):
     """Load result of one dataset or all datasets (if no argument) from json to dict
 
@@ -316,6 +327,7 @@ def load_result2019(dataset_name=None, parse_key=False):
 
     return result
 
+
 def save_result(dataset_name, key, res):
     """Save result to json
 
@@ -331,9 +343,10 @@ def save_result(dataset_name, key, res):
         os.makedirs(config.result_dir)
     json.dump(result, open(result_path, 'w'), indent=4)
 
+
 def dict_to_df(dic, row_keys_idx, col_keys_idx):
     """Convert dict to data frame
-        
+
     Args:
         dic: result dictionary. Keys are tuples.
         row_keys_idx: index of keys for rows, ordered hierarchicallly
@@ -362,7 +375,7 @@ def dict_to_df(dic, row_keys_idx, col_keys_idx):
         for c in col_keys:
             disorder_key = c + r + sheet_key
             key = tuple([d for o, d in sorted(zip(order, disorder_key))])
-            
+
             if key in dic.keys():
                 row.append(dic[key])
             else:
@@ -371,9 +384,10 @@ def dict_to_df(dic, row_keys_idx, col_keys_idx):
     df = pd.DataFrame(data, index=index, columns=columns)
     return df
 
+
 def dict_to_dfs(dic, row_keys_idx, col_keys_idx, df_idx):
     """Convert dict to multiple dataframes saved in one dict
-    
+
     Args:
         dic (dict): result dictionary. Keys are tuples.
         row_keys_idx (int): index of keys for rows, ordered hierarchicallly
@@ -388,6 +402,7 @@ def dict_to_dfs(dic, row_keys_idx, col_keys_idx, df_idx):
         dfs[k] = df
     return dfs
 
+
 def df_to_xls(df, save_path):
     """Save single pd.DataFrame to a excel file"""
     directory = os.path.dirname(save_path)
@@ -397,6 +412,7 @@ def df_to_xls(df, save_path):
     df.to_excel(writer)
     writer.save()
 
+
 def df_to_pickle(df, save_path):
     """Save single pd.DataFrame to a pickle file"""
     directory = os.path.dirname(save_path)
@@ -404,9 +420,10 @@ def df_to_pickle(df, save_path):
         os.makedirs(directory)
     df.to_pickle(save_path)
 
+
 def dfs_to_xls(dfs, save_path):
     """Save multiple pd.DataFrame in a dict to a excel file
-    
+
     Args:
         dfs (dict): {sheet_name: pd.DataFrame}
     """
@@ -418,9 +435,10 @@ def dfs_to_xls(dfs, save_path):
         df.to_excel(writer, '%s'%k)
     writer.save()
 
+
 def dict_to_xls(dic, row_keys_idx, col_keys_idx, save_path, sheet_idx=None):
     """Convert dict to excel
-    
+
     Args:
         dic: result dictionary. Keys are tuples.
         row_keys_idx: index of keys for rows, ordered hierarchicallly
@@ -433,6 +451,7 @@ def dict_to_xls(dic, row_keys_idx, col_keys_idx, save_path, sheet_idx=None):
     else:
         dfs = dict_to_dfs(dic, row_keys_idx, col_keys_idx, sheet_idx)
         dfs_to_xls(dfs, save_path)
+
 
 def flatten_dict(dictionary):
     """Convert hierarchic dictionary into a flat dict by extending dimension of keys.
@@ -453,6 +472,7 @@ def flatten_dict(dictionary):
             flat_dict[new_key] = vv
     return flatten_dict(flat_dict)
 
+
 def rearrange_dict(dictionary, order):
     """Rearrange the order of key of dictionary"""
     new_dict = {}
@@ -469,11 +489,13 @@ def rearrange_dict(dictionary, order):
         new_dict[new_key] = value
     return new_dict
 
+
 def makedirs(dir_list):
     save_dir = os.path.join(*dir_list)
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
     return save_dir
+
 
 def result_to_table(result, save_dir, csv=True, xls=True):
     """Convert result to tables. One table for each dataset.
@@ -482,9 +504,7 @@ def result_to_table(result, save_dir, csv=True, xls=True):
         result (dict): key: (dataset_name, split_seed, error_type, train_file, model_name, seed)
         csv (bool): save csv table
         xls (bool): save xls table
-
     """
-
     # save csv table
     if csv:
         csv_dir = makedirs([save_dir, 'csv'])
@@ -501,7 +521,8 @@ def result_to_table(result, save_dir, csv=True, xls=True):
             dataset_result = flatten_dict({k:v for k, v in result.items() if k[0] == dataset})
             save_path = os.path.join(xls_dir, '{}_result.xls'.format(dataset))
             dict_to_xls(dataset_result, [0, 1, 3, 4, 5], [6], save_path, sheet_idx=2)
-            
+
+
 def group(result, idx, keepdim=False):
     """Group results on one dimension (key component) into a list
 
@@ -512,7 +533,6 @@ def group(result, idx, keepdim=False):
         idx: the index of dimension (key component) by which the result is grouped 
         keepdim (bool): keep or delete dimension by which the result is grouped 
     """
-
     # get domain in given dimension (key component)
     domain = list({k[idx] for k in result.keys()})
 
@@ -530,7 +550,7 @@ def group(result, idx, keepdim=False):
             # new value 
             if new_key not in new_result.keys():
                 new_result[new_key] = defaultdict(list)
-            
+
             # apppend results into list
             for vk, vv in v.items():
                 # don't include best param saved in result
@@ -539,7 +559,7 @@ def group(result, idx, keepdim=False):
 
             if keepdim:
                 new_result[new_key]["group_key"].append(old_key[idx])
-    
+
     if keepdim:
         final_result = {}
         for k, v in new_result.items():
@@ -550,9 +570,10 @@ def group(result, idx, keepdim=False):
         new_result = final_result
     return new_result
 
+
 def reduce_by_mean(result):
     """Reduce a list of results into a single result by mean
-        
+
     Args:
         result (dict): result dict
             key (tuple): (dataset_name, split_seed, error_type, train_file, model_name)
@@ -566,9 +587,10 @@ def reduce_by_mean(result):
         new_result[k] = new_value
     return new_result
 
+
 def reduce_by_max_val(result, dim=None, dim_name=None):
     """Reduce a list of results into a single result by the result corresponding to the best val_acc
-        
+
     Args:
         result (dict): result dict
             key (tuple): (dataset_name, split_seed, error_type, train_file, model_name)
@@ -599,15 +621,17 @@ def reduce_by_max_val(result, dim=None, dim_name=None):
 
     return new_result
 
+
 def get_dirty_clean_train_files(error_type):
     files = get_train_files(error_type)
     dirty_file = files[0]
     clean_file = files[1:]
     return dirty_file, clean_file
 
+
 def group_reduce_by_best_clean(result):
     """Group by clean method and then reduce a list of results into a single result by the result corresponding to the best val_acc
-        
+
     Args:
         result (dict): result dict
             key (tuple): (dataset_name, split_seed, error_type, train_file, model_name)
@@ -651,7 +675,7 @@ def group_reduce_by_best_clean(result):
         else:
             new_k = k
         new_clean[new_k] = v
-    
+
     new_dirty = {}
     for k, v in dirty.items():
         new_v = {}
