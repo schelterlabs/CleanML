@@ -1,11 +1,7 @@
 """Main function"""
 
-import numpy as np
 import utils
-import json
 import argparse
-import datetime
-import time
 import config
 from experiment import experiment
 from relation import populate
@@ -25,9 +21,13 @@ args = parser.parse_args()
 
 # run experiments on datasets
 if args.run_experiments:
+    print("=== Running experiments ===")
     datasets = [utils.get_dataset(args.dataset)] if args.dataset is not None else config.datasets
     experiment(datasets, args.log, args.cpu, args.nosave, args.error_type, args.seeds)
 
 # run analysis on results
 if args.run_analysis:
-    populate([args.alpha])  
+    print("=== Running analysis ===")
+    populate([args.alpha])
+
+print("Done")
