@@ -1,5 +1,5 @@
 """Configuration of experiment and schema"""
-from schema import dataset, model, error_type, clean_method, scenario
+from schema import dataset, model, error_type, scenario
 
 # =============================================================================
 # Directory Configuration

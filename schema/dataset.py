@@ -1,5 +1,4 @@
 """Define the domain of dataset"""
-from .error_type import *
 
 # details of each dataset
 KDD = {
