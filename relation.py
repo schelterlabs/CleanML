@@ -1,21 +1,20 @@
 """Populate relations using training results"""
-import json
-import pandas as pd
 import numpy as np
-import utils
-from scipy.stats import ttest_rel
-import config
 import os
-from matplotlib import pyplot as plt
-from statsmodels.stats.multitest import multipletests, fdrcorrection_twostage
-import json
-import sys
+import pandas as pd
+from scipy.stats import ttest_rel
+from statsmodels.stats.multitest import multipletests
 
-"""Compare class"""
+import config
+import utils
+
 class Compare(object):
+    """Compare class"""
+
     def __init__(self, result, compare_method, compare_metric):
         super(Compare, self).__init__()
-        """ Compare
+        """Compare
+
         Args:
             result (dict): result dict
             compare_method (fn): function to compare two metrics
@@ -29,7 +28,7 @@ class Compare(object):
         self.compare_result = {}
         for error_type in config.error_types:
             self.compare_result[error_type['name']], self.four_metrics[error_type['name']] = self.compare_error(error_type['name'])
-        
+
         # key order: error/clean_method/dataset/models/scenario/ [compare_keys...]
         self.compare_result = utils.flatten_dict(self.compare_result)
 
@@ -93,7 +92,6 @@ class Compare(object):
 
         Return: 
             clean_method/dataset/model/scenario/compare_method:result
-
         """
         ## each error has two types of files
         # file type 1
@@ -116,8 +114,9 @@ class Compare(object):
             utils.dfs_to_xls(self.four_metrics[error_type['name']], save_path)
         flat_metrics = utils.flatten_dict(self.four_metrics)
 
-"""Comparing method"""
+
 def t_test(dirty, clean):
+    """Comparing method"""
     def two_tailed_t_test(dirty, clean):
         n_d = len(dirty)
         n_c = len(clean)
@@ -141,41 +140,49 @@ def t_test(dirty, clean):
             else:
                 p = 1 - p_two * 0.5
         return {"t-stats":t, "p-value":p}
-     
+
     result = {}
     result['two_tail'] = two_tailed_t_test(dirty, clean)
     result['one_tail_pos'] = one_tailed_t_test(dirty, clean, 'positive')
     result['one_tail_neg'] = one_tailed_t_test(dirty, clean, 'negative')
     return result
 
+
 def mean_f1(dirty, clean):
     result = {"dirty_f1": np.mean(dirty), "clean_f1":np.mean(clean)}
     return result
+
 
 def mean_acc(dirty, clean):
     result = {"dirty_acc": np.mean(dirty), "clean_acc":np.mean(clean)}
     return result
 
+
 def diff_f1(dirty, clean):
     result = {"diff_f1": np.mean((clean - dirty) / dirty)}
     return result
+
 
 def diff_acc(dirty, clean):
     result = {"diff_acc": np.mean((clean - dirty) / dirty)}
     return result
 
+
 def direct_count(dirty, clean):
     result = {"pos_count": np.sum(dirty - clean < -1e-8), "neg_count": np.sum(dirty - clean > 1e-8), "same_count": np.sum(np.abs(dirty - clean) < 1e-8)}
     return result
 
-"""Comparing metrics"""
+
+### Comparing metrics
 def test_f1(dataset_name, error_type, test_file):
     metric = test_file + "_test_f1"
     return metric
 
+
 def test_acc(dataset_name, error_type, test_file):
     metric = test_file + "_test_acc"
     return metric
+
 
 def mixed_f1_acc(dataset_name, error_type, test_file):
     if error_type == 'mislabel':
@@ -187,8 +194,9 @@ def mixed_f1_acc(dataset_name, error_type, test_file):
         metric = test_file + "_test_acc"
     return metric
 
-"""Multiple hypothesis test """
+
 def hypothesis_test(t_test_results, alpha=0.05, multiple_test_method='fdr_by'):
+    """Multiple hypothesis test"""
     # convert to pd.DataFrame
     t_test_results_df = utils.dict_to_df(t_test_results, [0, 1, 2, 3, 4], [5, 6])
 
@@ -224,8 +232,9 @@ def hypothesis_test(t_test_results, alpha=0.05, multiple_test_method='fdr_by'):
             hypothesis_result[(e, d, c, m, s, 'flag')] = 'S'
     return hypothesis_result
 
-"""Group and split the result """
+
 def split_clean_method(result):
+    """Group and split the result """
     new_result = {}
     for (error, dataset, clean_method, model, scenario, comp_key), value in result.items():
         if error == 'outliers':
@@ -237,16 +246,19 @@ def split_clean_method(result):
         new_result[(error, dataset, detect, repair, model, scenario, comp_key)] = value
     return new_result
 
+
 def group_by_mean(result):
     # group by training seed and reduce by mean
     result = utils.group(result, 5)
     result = utils.reduce_by_mean(result)
     return result
 
+
 def group_by_max(result):
     result = utils.group(result, 5)
     result = utils.reduce_by_max_val(result)
     return result
+
 
 def group_by_best_model(result):
     # select best model by max val acc
@@ -256,10 +268,12 @@ def group_by_best_model(result):
     result = utils.reduce_by_max_val(result, dim=4, dim_name="model")
     return result
 
+
 def group_by_best_model_clean(result_best_model):
     # select best model by max val acc
     result = utils.group_reduce_by_best_clean(result_best_model)
-    return result    
+    return result
+
 
 def elim_redundant_dim(relation, dims):
     new_rel = {}
@@ -268,8 +282,9 @@ def elim_redundant_dim(relation, dims):
         new_rel[new_key] = v
     return new_rel
 
-"""Populate relations"""
+
 def populate_relation(result, name, alphas=[0.05], split_detect=True, multiple_test_method='fdr_by'):
+    """Populate relations"""
     print("Populate relation", name)
     # create save folder
     save_dir = utils.makedirs([config.analysis_dir, name])
@@ -318,7 +333,7 @@ def populate_relation(result, name, alphas=[0.05], split_detect=True, multiple_t
         save_path = os.path.join(relation_csv_dir, '{}_{}.csv'.format(name, "{:.6f}".format(alpha).rstrip('0')))
 
         relation_df = relation_df.reset_index()
-        
+
         if name == "R1":
             relation_df.rename(columns={"level_0": "error_type", "level_1":"dataset", "level_2": "detect_method", 
                                         "level_3": "repair_method", "level_4": "model", "level_5": "scenario"}, inplace=True)
@@ -333,6 +348,7 @@ def populate_relation(result, name, alphas=[0.05], split_detect=True, multiple_t
         relation_pkl_dir = utils.makedirs([relation_dir, 'pkl'])
         save_path = os.path.join(relation_pkl_dir, '{}_{}.pkl'.format(name, "{:.6f}".format(alpha).rstrip('0')))
         utils.df_to_pickle(relation_df, save_path)
+
 
 def populate(alphas, save_training=False):
     """Populate R1, R2 and R3"""
