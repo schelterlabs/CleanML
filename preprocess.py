@@ -1,12 +1,15 @@
 """ Load and preprocess data"""
+import numpy as np
+import pandas as pd
+
 from sklearn.preprocessing import LabelEncoder
 from imblearn.under_sampling import RandomUnderSampler
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import SelectKBest, chi2
-import numpy as np
-import pandas as pd
+
 import utils
+
 
 def check_version(dataset, error_type, train_file):
     """Check whether train and test are of the same version"""
@@ -17,7 +20,8 @@ def check_version(dataset, error_type, train_file):
         test_path_pfx = utils.get_dir(dataset, error_type, test_file)
         test_version = utils.get_version(test_path_pfx)
         assert(train_version == test_version)
-        
+
+
 def load_data(dataset, train_path, test_path_list):
     """Load and split data into features and label.
 
@@ -29,7 +33,7 @@ def load_data(dataset, train_path, test_path_list):
     # load data 
     train = utils.load_df(dataset, train_path)
     test_list = [utils.load_df(dataset, test_dir) for test_dir in test_path_list]
-    
+
     # split X, y
     label = dataset['label']
     features = [v for v in train.columns if not v == label]
@@ -39,12 +43,14 @@ def load_data(dataset, train_path, test_path_list):
 
     return X_train, y_train, X_test_list, y_test_list  
 
+
 def drop_variables(X_train, X_test_list, drop_columns):
     """Drop irrelavant features"""
     n_test_files = len(X_test_list)
     X_train.drop(columns=drop_columns, inplace=True)
     for i in range(n_test_files):
         X_test_list[i].drop(columns=drop_columns, inplace=True)
+
 
 def down_sample(X, y, random_state):
     rus = RandomUnderSampler(random_state=random_state)
@@ -53,6 +59,7 @@ def down_sample(X, y, random_state):
     X_train = X.iloc[indices, :].reset_index(drop=True)
     y_train = y.iloc[indices].reset_index(drop=True)
     return X_train, y_train
+
 
 def encode_cat_label(y_train, y_test_list):
     n_tr = y_train.shape[0]
@@ -66,6 +73,7 @@ def encode_cat_label(y_train, y_test_list):
     y_train = y[:n_tr]
     y_test_list = np.split(y[n_tr:], test_split)
     return y_train, y_test_list
+
 
 def text_embedding(corpus_train, corpus_test_list, y_train):
     vectorizer = TfidfVectorizer(stop_words='english')
@@ -81,6 +89,7 @@ def text_embedding(corpus_train, corpus_test_list, y_train):
     x_train = pd.DataFrame(x_train.toarray(), columns=feature_names)
     x_test_list = [pd.DataFrame(x_test.toarray(), columns=feature_names) for x_test in x_test_list]
     return x_train, x_test_list
+
 
 def encode_text_features(X_train, X_test_list, y_train, text_columns):
     n_test_files = len(X_test_list)
@@ -99,6 +108,7 @@ def encode_text_features(X_train, X_test_list, y_train, text_columns):
             X_test_list[i] = pd.concat([X_test_list[i], x_test_list[i]], axis=1)
     return X_train, X_test_list
 
+
 def encode_cat_features(X_train, X_test_list):
     n_tr = X_train.shape[0]
     n_te_list = [X_test.shape[0] for X_test in X_test_list]
@@ -110,6 +120,7 @@ def encode_cat_features(X_train, X_test_list):
     X_train = X[:n_tr, :]
     X_test_list = np.split(X[n_tr:], test_split)
     return X_train, X_test_list
+
 
 def preprocess(dataset, error_type, train_file, normalize=True, down_sample_seed=1):
     """Load and preprocess data
@@ -128,7 +139,7 @@ def preprocess(dataset, error_type, train_file, normalize=True, down_sample_seed
     train_path = utils.get_dir(dataset, error_type, train_file + "_train.csv")
     test_files = utils.get_test_files(error_type, train_file)
     test_path_list = [utils.get_dir(dataset, error_type, test_file + "_test.csv") for test_file in test_files]
-    
+
     # load data
     X_train, y_train, X_test_list, y_test_list = load_data(dataset, train_path, test_path_list)
 
@@ -153,7 +164,7 @@ def preprocess(dataset, error_type, train_file, normalize=True, down_sample_seed
 
     # encode categorical features
     X_train, X_test_list = encode_cat_features(X_train, X_test_list)
-    
+
     # normalize data
     if normalize:
         scaler = StandardScaler()
@@ -161,4 +172,3 @@ def preprocess(dataset, error_type, train_file, normalize=True, down_sample_seed
         X_test_list = [scaler.transform(X_test) for X_test in X_test_list]
 
     return X_train, y_train, X_test_list, y_test_list, test_files
-
