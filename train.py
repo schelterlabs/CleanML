@@ -1,16 +1,9 @@
 """Train the model"""
 import numpy as np
-import pandas as pd
-import argparse
-import config
-import utils
-import sys
-from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
-import pickle
-from preprocess import preprocess
+
+from sklearn.model_selection import GridSearchCV, cross_val_score
 from sklearn.metrics import f1_score
-from sklearn.feature_selection import SelectKBest, chi2
-from sklearn.model_selection import cross_val_score
+
 
 def parse_searcher(searcher):
     """Get results from gridsearch
@@ -26,9 +19,10 @@ def parse_searcher(searcher):
     best_model = searcher.best_estimator_
     return best_model, best_params, train_acc, val_acc
 
+
 def train(X_train, y_train, estimator, param_grid, seed=1, n_jobs=1, skip=False):
     """Train the model 
-        
+
     Args:
         X_train (pd.DataFrame): features (train)
         y_train (pd.DataFrame): label (train)
@@ -45,7 +39,7 @@ def train(X_train, y_train, estimator, param_grid, seed=1, n_jobs=1, skip=False)
         best_model.fit(X_train, y_train)
         result = {}
         return best_model, result
-    
+
     # train and tune hyper parameter with 5-fold cross validation
     if param_grid is not None:
         searcher = GridSearchCV(estimator, param_grid, cv=5, n_jobs=n_jobs, return_train_score=True)
@@ -62,6 +56,7 @@ def train(X_train, y_train, estimator, param_grid, seed=1, n_jobs=1, skip=False)
     result = {"best_params": best_params, "train_acc":train_acc, "val_acc": val_acc}
     return best_model, result
 
+
 def evaluate(best_model, X_test_list, y_test_list, test_files):
     # evaluate on test sets
     result = {}
@@ -77,6 +72,7 @@ def evaluate(best_model, X_test_list, y_test_list, test_files):
             result[file + "_test_f1"] = test_f1  
     return result
 
+
 def get_coarse_grid(model, seed, n_jobs, N):
     """Get hyper parameters (coarse random search) """
     np.random.seed(seed)
@@ -88,6 +84,7 @@ def get_coarse_grid(model, seed, n_jobs, N):
             high = min(high, int(N/5*4))
         param_grid = {model['hyperparams']: np.random.randint(low, high, 20)}
     return param_grid
+
 
 def get_fine_grid(model, best_param_coarse, n_jobs, N):
     """Get hyper parameters (fine grid search, around the best parameter in coarse search) """
@@ -101,6 +98,7 @@ def get_fine_grid(model, best_param_coarse, n_jobs, N):
             high = min(high, int(N/5*4))
         param_grid = {model['hyperparams']: np.arange(low, high)}
     return param_grid
+
 
 def hyperparam_search(X_train, y_train, model, n_jobs=1, seed=1, hyperparams=None):
     np.random.seed(seed)
@@ -125,7 +123,7 @@ def hyperparam_search(X_train, y_train, model, n_jobs=1, seed=1, hyperparams=Non
         param_grid = get_coarse_grid(model, coarse_param_seed, n_jobs, len(y_train))
         best_model_coarse, result_coarse = train(X_train, y_train, estimator, param_grid, n_jobs=n_jobs, seed=coarse_train_seed)
         val_acc_coarse = result_coarse['val_acc']
-        
+
         # fine grid search
         best_param_coarse = result_coarse['best_params'][model['hyperparams']]
         param_grid = get_fine_grid(model, best_param_coarse, n_jobs, len(y_train))
@@ -145,9 +143,10 @@ def hyperparam_search(X_train, y_train, model, n_jobs=1, seed=1, hyperparams=Non
 
     return best_model, result
 
+
 def train_and_evaluate(X_train, y_train, X_test_list, y_test_list, test_files, model, n_jobs=1, seed=1, hyperparams=None):
     """Search hyperparameters and evaluate
-        
+
     Args:
         X_train (pd.DataFrame): features (train)
         y_train (pd.DataFrame): label (train)
