@@ -4,6 +4,6 @@
 .DS_Store
 data/*
 */trash/*
-venv/
+venv*/
 result/
 analysis/
