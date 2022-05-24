@@ -3,27 +3,30 @@
         Delete missing features for dataset not having "missing_values" in config
         Split dataset into train/test
 """
+import argparse
+import numpy as np
+import pandas as pd
+
 import config
 import utils
-import pandas as pd
-import numpy as np
-import os
-import argparse
+
 
 def delete_missing_labels(raw, label_name):
-    """ Delete missing labels"""
+    """Delete missing labels"""
     label = raw[label_name]
     is_missing_label = label.isnull()
     dirty = raw[is_missing_label == False]
     return dirty
 
+
 def delete_missing_values(raw):
-    """ Delete missing values"""
+    """Delete missing values"""
     dirty = raw.dropna()
     return dirty
 
+
 def split(data, test_ratio, seed, max_size=None):
-    """ Shuffle and split data to train / test"""
+    """Shuffle and split data to train / test"""
     # random shuffle 
     np.random.seed(seed)
     N = data.shape[0]
@@ -44,12 +47,13 @@ def split(data, test_ratio, seed, max_size=None):
 
     return train, test, idx_train, idx_test
 
+
 def reset(dataset):
-    """ Reset dataset"""
+    """Reset dataset"""
     # delete folders for each error
     for error in dataset['error_types']:
         utils.remove(utils.get_dir(dataset, error))
-    
+
     # delete dirty_train and dirty_test in raw folder
     utils.remove(utils.get_dir(dataset, 'raw', 'dirty_train.csv'))
     utils.remove(utils.get_dir(dataset, 'raw', 'dirty_test.csv'))
@@ -58,9 +62,10 @@ def reset(dataset):
     utils.remove(utils.get_dir(dataset, 'raw', 'idx_test.csv'))
     utils.remove(utils.get_dir(dataset, 'raw', 'version.json'))
 
+
 def init(dataset, test_ratio=0.3, seed=1, max_size=None):
-    """ Initialize dataset: raw -> dirty -> dirty_train, dirty_test
-        
+    """Initialize dataset: raw -> dirty -> dirty_train, dirty_test
+
         Args:
             dataset (dict): dataset dict in config.py
             max_size (int): maximum limit of dataset size
@@ -88,7 +93,7 @@ def init(dataset, test_ratio=0.3, seed=1, max_size=None):
 
     # save the version (seed) of dataset
     utils.save_version(save_path_pfx, seed)
-    
+
     # save index
     save_path_pfx = utils.get_dir(dataset, 'raw', 'idx')
     utils.save_dfs(idx_train, idx_test, save_path_pfx)
@@ -96,6 +101,7 @@ def init(dataset, test_ratio=0.3, seed=1, max_size=None):
     # save dirty
     # save_path = utils.get_dir(dataset, 'raw', 'dirty.csv')
     # dirty.to_csv(save_path, index=False)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
