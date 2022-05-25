@@ -363,9 +363,9 @@ def populate(alphas, save_training=False):
     populate_relation(result_vanilla, "R1", alphas=alphas)
 
     # populate R2
-    result_best_model = group_by_best_model(result)
-    populate_relation(result_best_model, "R2", alphas=alphas)
+    # result_best_model = group_by_best_model(result)
+    # populate_relation(result_best_model, "R2", alphas=alphas)
 
     # # populate R3
-    result_best_model_clean = group_by_best_model_clean(result_best_model)
-    populate_relation(result_best_model_clean, "R3", alphas=alphas)
+    # result_best_model_clean = group_by_best_model_clean(result_best_model)
+    # populate_relation(result_best_model_clean, "R3", alphas=alphas)
