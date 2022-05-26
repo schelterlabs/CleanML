@@ -72,6 +72,7 @@ def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_
             result[file + "_test_f1"] = test_f1
 
     for group in test_group_memberships.keys():
+        group_name = group.lower()
         for X_test, y_test, file, priv_idx in zip(X_test_list, y_test_list, test_files, test_group_memberships[group]):
 
             # Indexes for disadvantaged group
@@ -83,16 +84,18 @@ def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_
 
             eq_opp = (float(dis_fn) / (dis_fn + dis_tp)) - (float(priv_fn) / (priv_fn + priv_tp))
 
-            print(group, eq_opp)
+            print(group, file, eq_opp)
 
-            result[file + f"__{group.lower()}_priv__tn"] = int(priv_tn)
-            result[file + f"__{group.lower()}_priv__fp"] = int(priv_fp)
-            result[file + f"__{group.lower()}_priv__fn"] = int(priv_fn)
-            result[file + f"__{group.lower()}_priv__tp"] = int(priv_tp)
-            result[file + f"__{group.lower()}_dis__tn"] = int(dis_tn)
-            result[file + f"__{group.lower()}_dis__fp"] = int(dis_fp)
-            result[file + f"__{group.lower()}_dis__fn"] = int(dis_fn)
-            result[file + f"__{group.lower()}_dis__tp"] = int(dis_tp)
+            # result[f"{file}__{group_name}_priv__tn"] = int(priv_tn)
+            # result[f"{file}__{group_name}_priv__fp"] = int(priv_fp)
+            # result[f"{file}__{group_name}_priv__fn"] = int(priv_fn)
+            # result[f"{file}__{group_name}_priv__tp"] = int(priv_tp)
+            # result[f"{file}__{group_name}_dis__tn"] = int(dis_tn)
+            # result[f"{file}__{group_name}_dis__fp"] = int(dis_fp)
+            # result[f"{file}__{group_name}_dis__fn"] = int(dis_fn)
+            # result[f"{file}__{group_name}_dis__tp"] = int(dis_tp)
+
+            result[f"{file}_test_eqopp__{group_name}"] = eq_opp
 
     return result
 
