@@ -61,7 +61,7 @@ def drop_variables(X_train, X_test_list, drop_columns):
 
 def down_sample(X, y, random_state):
     rus = RandomUnderSampler(random_state=random_state)
-    X_rus, y_rus = rus.fit_sample(X, y)
+    X_rus, y_rus = rus.fit_resample(X, y)
     indices = rus.sample_indices_
     X_train = X.iloc[indices, :].reset_index(drop=True)
     y_train = y.iloc[indices].reset_index(drop=True)

@@ -266,7 +266,7 @@ ACSIncome = {
     "label": "label",
     "categorical_variables": ["label", "COW", "SCHL", "MAR", "OCCP", "POBP", "RELP", "SEX", "RAC1P"],
     "ml_task": "classification",
-    # "class_imbalance": True,  # this breaks down-sampling in preprocess.py
+    "class_imbalance": True,
     "privileged_groups": {
         "RAC1P": "1",
         "SEX": "1",
