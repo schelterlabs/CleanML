@@ -11,7 +11,7 @@ import utils
 class Compare(object):
     """Compare class"""
 
-    def __init__(self, result, compare_method, compare_metric):
+    def __init__(self, result, compare_method, compare_metric, fairness=False):
         super(Compare, self).__init__()
         """Compare
 
@@ -21,8 +21,9 @@ class Compare(object):
             compare_metric (fn): function to specify metrics to be compared
         """
         self.result = result
-        self.compare_metric = compare_metric
         self.compare_method = compare_method
+        self.compare_metric = compare_metric
+        self.fairness = fairness
 
         self.four_metrics = {}
         self.compare_result = {}
@@ -46,9 +47,15 @@ class Compare(object):
         for (dataset, split_seed, error, train_file, model), value in self.result.items():
             if error == error_type and train_file in file_types:
                 for test_file in file_types:
-                    metric_name = self.compare_metric(dataset, error_type, test_file)
-                    metric = value[metric_name]
-                    four_metrics[(dataset, split_seed, train_file, model, test_file)] = metric
+                    if self.fairness:
+                        for group in utils.get_dataset(dataset).get("privileged_groups"):
+                            metric_name = self.compare_metric(dataset, error_type, test_file, group.lower())
+                            metric = value[metric_name]
+                            four_metrics[(f"{dataset}__{group}", split_seed, train_file, model, test_file)] = metric
+                    else:
+                        metric_name = self.compare_metric(dataset, error_type, test_file)
+                        metric = value[metric_name]
+                        four_metrics[(dataset, split_seed, train_file, model, test_file)] = metric
 
         four_metrics = utils.dict_to_df(four_metrics, [0, 2, 1], [3, 4]).sort_index()
         return four_metrics
@@ -158,6 +165,11 @@ def mean_acc(dirty, clean):
     return result
 
 
+def mean_eqopp(dirty, clean):
+    result = {"dirty_eqopp": np.mean(dirty), "clean_eqopp": np.mean(clean)}
+    return result
+
+
 def diff_f1(dirty, clean):
     result = {"diff_f1": np.mean((clean - dirty) / dirty)}
     return result
@@ -165,6 +177,11 @@ def diff_f1(dirty, clean):
 
 def diff_acc(dirty, clean):
     result = {"diff_acc": np.mean((clean - dirty) / dirty)}
+    return result
+
+
+def diff_eqopp(dirty, clean):
+    result = {"diff_eqopp": np.mean((clean - dirty) / dirty)}
     return result
 
 
@@ -181,6 +198,11 @@ def test_f1(dataset_name, error_type, test_file):
 
 def test_acc(dataset_name, error_type, test_file):
     metric = test_file + "_test_acc"
+    return metric
+
+
+def test_eqopp(dataset_name, error_type, test_file, group):
+    metric = test_file + "_test_eqopp__" + group
     return metric
 
 
@@ -292,24 +314,30 @@ def populate_relation(result, name, alphas=[0.05], split_detect=True, multiple_t
     metric_dir = utils.makedirs([save_dir, 'four_metrics'])
 
     # get other attributes
-    attr_mean_acc = Compare(result, mean_acc, test_acc).compare_result       # attr: dirty_acc, clean_acc
-    attr_diff_acc = Compare(result, diff_acc, test_acc).compare_result       # attr: diff_acc
-    attr_mean_f1 = Compare(result, mean_f1, test_f1).compare_result          # attr: dirty_f1, clean_f1
-    attr_diff_f1 = Compare(result, diff_f1, test_f1).compare_result          # attr: diff_f1
-    attr_count = Compare(result, direct_count, mixed_f1_acc).compare_result  # attr: pos count, neg count, same count
+    attr_mean_acc = Compare(result, mean_acc, test_acc).compare_result        # attr: dirty_acc, clean_acc
+    attr_diff_acc = Compare(result, diff_acc, test_acc).compare_result        # attr: diff_acc
+    attr_mean_f1 = Compare(result, mean_f1, test_f1).compare_result           # attr: dirty_f1, clean_f1
+    attr_diff_f1 = Compare(result, diff_f1, test_f1).compare_result           # attr: diff_f1
+    attr_count = Compare(result, direct_count, mixed_f1_acc).compare_result   # attr: pos count, neg count, same count
+    attr_mean_eqopp = Compare(result, mean_eqopp, test_eqopp, fairness=True).compare_result  # attr: dirty_eqopp, clean_eqopp
+    attr_diff_eqopp = Compare(result, diff_eqopp, test_eqopp, fairness=True).compare_result  # attr: diff_eqopp
 
     # run t-test 
     t_test_comp = Compare(result, t_test, mixed_f1_acc)
     t_test_comp.save_four_metrics(metric_dir)
+    t_test_comp_fairness = Compare(result, t_test, test_eqopp, fairness=True)
+    t_test_comp_fairness.save_four_metrics(metric_dir)
 
     # hypothesis test
     for alpha in alphas:
         # print(alpha)
         # get attribute flag by multiple hypothesis test
         attr_flag = hypothesis_test(t_test_comp.compare_result, alpha, multiple_test_method)
+        attr_flag_fairness = hypothesis_test(t_test_comp_fairness.compare_result, alpha, multiple_test_method)
 
         # populate relation with all of attributes
-        relation = {**attr_flag, **attr_mean_acc, **attr_mean_f1, **attr_diff_acc, **attr_diff_f1, **attr_count}
+        relation = {**attr_flag, **attr_mean_acc, **attr_mean_f1, **attr_diff_acc, **attr_diff_f1, **attr_count,
+                    **attr_flag_fairness, **attr_mean_eqopp, **attr_diff_eqopp}
 
         # split detect
         if split_detect and name != "R3":
