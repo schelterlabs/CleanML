@@ -79,10 +79,14 @@ Restaurant = {
 Credit = {
     "data_dir": "Credit",
     "error_types": ["outliers", "missing_values"],
+    "drop_variables": ["age"],
     "label": "SeriousDlqin2yrs",
     "categorical_variables":["SeriousDlqin2yrs"],
     "ml_task": "classification",
-    "class_imbalance":True
+    "class_imbalance":True,
+    "privileged_groups": [
+        ("age", operator.ge, 30),
+    ],
 }
 
 Sensor = {
