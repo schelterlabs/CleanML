@@ -9,10 +9,10 @@ missing_values = {
         # "impute_holoclean": MVHoloCleaner(),
         "impute_mean_mode": MVCleaner("impute", num="mean", cat="mode"),
         "impute_mean_dummy": MVCleaner("impute", num="mean", cat="dummy"),
-        # "impute_median_mode": MVCleaner("impute", num="median", cat="mode"),
-        # "impute_median_dummy": MVCleaner("impute", num="median", cat="dummy"),
-        # "impute_mode_mode": MVCleaner("impute", num="mode", cat="mode"),
-        # "impute_mode_dummy": MVCleaner("impute", num="mode", cat="dummy"),
+        "impute_median_mode": MVCleaner("impute", num="median", cat="mode"),
+        "impute_median_dummy": MVCleaner("impute", num="median", cat="dummy"),
+        "impute_mode_mode": MVCleaner("impute", num="mode", cat="mode"),
+        "impute_mode_dummy": MVCleaner("impute", num="mode", cat="dummy"),
     }
 }
 
