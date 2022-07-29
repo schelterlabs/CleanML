@@ -274,6 +274,18 @@ ACSIncome = {
     }
 }
 
+Cardio = {
+    "data_dir": "Cardio",
+    "error_types": ["outliers", "mislabel"],
+    "drop_variables": ["age", "gender"],
+    "label": "cardio",
+    "ml_task": "classification",
+    # "class_imbalance": ?,
+    "privileged_groups": {
+        "gender": 2,
+    },
+}
+
 # domain of dataset 
 datasets = [KDD, Credit, Airbnb, USCensus, EEG, Titanic, 
             Marketing, Sensor, Movie, Restaurant, Citation, 
@@ -281,4 +293,4 @@ datasets = [KDD, Credit, Airbnb, USCensus, EEG, Titanic,
             USCensus_uniform, USCensus_major, USCensus_minor,
             EEG_uniform, EEG_minor, EEG_major, Titanic_uniform, Titanic_minor, Titanic_major,
             Marketing_uniform, Marketing_major, Marketing_minor, Credit_uniform, Credit_major, Credit_minor,
-            ACSIncome]
+            ACSIncome, Cardio]
