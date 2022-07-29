@@ -263,9 +263,9 @@ Credit_minor = {
 
 ACSIncome = {
     "data_dir": "ACSIncome",
-    "error_types": ["missing_values"],  # TODO
+    "error_types": ["missing_values", "outliers", "mislabel"],
+    "drop_variables": ["AGEP", "SEX", "RAC1P"],
     "label": "label",
-    "categorical_variables": ["label", "COW", "SCHL", "MAR", "OCCP", "POBP", "RELP", "SEX", "RAC1P"],
     "ml_task": "classification",
     "class_imbalance": True,
     "privileged_groups": {
