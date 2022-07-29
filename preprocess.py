@@ -42,9 +42,9 @@ def load_data(dataset, train_path, test_path_list):
     y_test_list = [test.loc[:, label] for test in test_list]
 
     test_group_memberships = {}
-    for membership_attribute, privileged_value in dataset["privileged_groups"].items():
+    for membership_attribute, operator, privileged_value in dataset["privileged_groups"]:
         test_group_memberships[membership_attribute] = [
-            np.array(test[membership_attribute] == privileged_value)
+            np.array(operator(test[membership_attribute], privileged_value))
             for test in test_list
         ]
 

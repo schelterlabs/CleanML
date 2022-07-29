@@ -1,4 +1,6 @@
 """Define the domain of dataset"""
+import operator
+
 
 # details of each dataset
 KDD = {
@@ -58,10 +60,10 @@ USCensus = {
     "drop_variables": ["Age", "Race", "Sex"],
     "label": 'Income',
     "ml_task": "classification",
-    "privileged_groups": {
-        "Race": " white",
-        "Sex": " male"
-    }
+    "privileged_groups": [
+        ("Race", operator.eq, " white"),
+        ("Sex", operator.eq, " male"),
+    ],
 }
 
 Restaurant = {
@@ -268,10 +270,10 @@ ACSIncome = {
     "label": "label",
     "ml_task": "classification",
     "class_imbalance": True,
-    "privileged_groups": {
-        "RAC1P": "1",
-        "SEX": "1",
-    }
+    "privileged_groups": [
+        ("RAC1P", operator.eq, "1"),
+        ("SEX", operator.eq, "1"),
+    ],
 }
 
 Cardio = {
@@ -281,9 +283,9 @@ Cardio = {
     "label": "cardio",
     "ml_task": "classification",
     # "class_imbalance": ?,
-    "privileged_groups": {
-        "gender": 2,
-    },
+    "privileged_groups": [
+        ("gender", operator.eq, 2),
+    ],
 }
 
 # domain of dataset 
