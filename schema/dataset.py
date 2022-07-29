@@ -55,6 +55,7 @@ EEG = {
 USCensus = {
     "data_dir": "USCensus",
     "error_types": ["missing_values"],
+    "drop_variables": ["Age", "Race", "Sex"],
     "label": 'Income',
     "ml_task": "classification",
     "privileged_groups": {
