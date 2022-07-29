@@ -19,7 +19,7 @@ missing_values = {
 outliers = {
     "name": "outliers",
     "clean_methods": {
-        "clean_HC_impute_holoclean": OutlierHoloCleaner(),
+        # "clean_HC_impute_holoclean": OutlierHoloCleaner(),
         "clean_SD_impute_mean_dummy": OutlierCleaner(detect_method="SD", repairer=MVCleaner("impute", num="mean", cat="dummy")),
         "clean_SD_impute_mode_dummy": OutlierCleaner(detect_method="SD", repairer=MVCleaner("impute", num="mode", cat="dummy")),
         "clean_SD_impute_median_dummy": OutlierCleaner(detect_method="SD", repairer=MVCleaner("impute", num="median", cat="dummy")),
