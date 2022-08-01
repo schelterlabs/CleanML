@@ -85,7 +85,7 @@ Credit = {
     "ml_task": "classification",
     "class_imbalance":True,
     "privileged_groups": [
-        ("age", operator.ge, 30),
+        ("age", operator.gt, 30),
     ],
 }
 
