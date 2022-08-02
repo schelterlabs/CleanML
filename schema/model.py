@@ -93,4 +93,5 @@ xgb_clf = {
 }
 
 # model domain
-models = [logistic_reg] #, knn_clf, dt_clf, adaboost_clf, random_forest_clf, gaussian_nb, xgb_clf]
+models = [logistic_reg, knn_clf, xgb_clf]
+# dt_clf, adaboost_clf, random_forest_clf, gaussian_nb
