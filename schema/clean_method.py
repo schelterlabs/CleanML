@@ -235,8 +235,8 @@ class MislabelCleaner(object):
         index_test = pd.read_csv(index_test_path).values.reshape(-1)
         clean_path = utils.get_dir(dataset, 'raw', 'mislabel_clean_raw.csv')
         clean = utils.load_df(dataset, clean_path)
-        self.clean_train = clean.loc[index_train, :]
-        self.clean_test = clean.loc[index_test, :]
+        self.clean_train = clean.loc[index_train, :].dropna().reset_index(drop=True)
+        self.clean_test = clean.loc[index_test, :].dropna().reset_index(drop=True)
 
     def clean(self, dirty_train, dirty_test):
         indicator_train = pd.DataFrame(np.any(self.clean_train.values != dirty_train.values, axis=1), columns=['indicator'])
