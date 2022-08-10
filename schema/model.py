@@ -85,11 +85,11 @@ gaussian_nb = {
 xgb_clf = {
     "name":"XGBoost",
     "fn": XGBClassifier,
-    "fixed_params": {},
+    "fixed_params": {"tree_method": "hist"},
     "type": "classification",
     "hyperparams": "max_depth",
     "hyperparams_type": "int",
-    "hyperparams_range": [1, 100]
+    "hyperparams_range": [6, 12]
 }
 
 # model domain
