@@ -38,7 +38,7 @@ def one_search_experiment(dataset, error_type, train_file, model, seed, n_jobs=1
     return result
 
 
-def one_split_experiment(dataset, n_retrain=5, seed=1, n_jobs=1, nosave=True, error_type=None):
+def one_split_experiment(dataset, log=False, n_retrain=5, seed=1, n_jobs=1, nosave=True, error_type=None):
     """Run experiments on one dataset for one split.
 
     Args:
@@ -78,9 +78,23 @@ def one_split_experiment(dataset, n_retrain=5, seed=1, n_jobs=1, nosave=True, er
                         hyperparams = None
                         skip_test_files = []
 
-                    print("{} Processing {}".format(datetime.datetime.now(), key)) 
+                    start_time = datetime.datetime.now()
+                    print("{} Processing {}".format(start_time, key))
+                    if log:
+                        logging.debug("{} Processing {}".format(start_time, key))
+
                     res = one_search_experiment(dataset, error, train_file, model, seed, n_jobs=n_jobs, hyperparams=hyperparams, skip_test_files=skip_test_files)
-                    
+
+                    end_time = datetime.datetime.now()
+                    print("{} Finished {}".format(end_time, key))
+                    total_seconds = (end_time - start_time).total_seconds()
+                    minutes = int(total_seconds / 60)
+                    seconds = round(total_seconds % 60)
+                    print("Finished in {} minutes {} seconds".format(minutes, seconds))
+                    if log:
+                        logging.debug("{} Finished {}".format(end_time, key))
+                        logging.debug("Finished in {} minutes {} seconds".format(minutes, seconds))
+
                     if key in result2019.keys():
                         res = {**result2019[key], **res}
 
@@ -117,7 +131,7 @@ def experiment(datasets, log=False, n_jobs=1, nosave=False, error_type=None, arg
             tic = time.time()
             init(dataset, seed=seed, max_size=config.max_size)
             clean(dataset, error_type)
-            one_split_experiment(dataset, n_retrain=config.n_retrain, n_jobs=n_jobs, nosave=nosave, seed=experiment_seed, error_type=error_type)
+            one_split_experiment(dataset, log=log, n_retrain=config.n_retrain, n_jobs=n_jobs, nosave=nosave, seed=experiment_seed, error_type=error_type)
             toc = time.time()
             t = (toc - tic) / 60
             remaining = t*(len(split_seeds)-i-1) 
