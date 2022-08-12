@@ -306,10 +306,4 @@ GermanCredit = {
 }
 
 # domain of dataset
-datasets = [KDD, Credit, Airbnb, USCensus, EEG, Titanic, 
-            Marketing, Sensor, Movie, Restaurant, Citation, 
-            Company, University, KDD_uniform, KDD_minor, KDD_major,
-            USCensus_uniform, USCensus_major, USCensus_minor,
-            EEG_uniform, EEG_minor, EEG_major, Titanic_uniform, Titanic_minor, Titanic_major,
-            Marketing_uniform, Marketing_major, Marketing_minor, Credit_uniform, Credit_major, Credit_minor,
-            ACSIncome, Cardio, GermanCredit]
+datasets = [USCensus, ACSIncome, Credit, Cardio, GermanCredit]
