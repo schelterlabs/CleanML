@@ -1,15 +1,14 @@
 """Clean datasets"""
-import pandas as pd
-import config
-import os
 import argparse
+import os
+
+import config
 import utils
-import sys
-import schema.clean_method
+
 
 def clean_error(dataset, error):
     """ Clean one error in the dataset.
-    
+
     Args:
         dataset (dict): dataset dict in dataset.py
         error (string): error type
@@ -37,7 +36,7 @@ def clean_error(dataset, error):
         # fit on dirty train and clean both train and test
         cleaner.fit(dataset, dirty_train)
         clean_train, ind_train, clean_test, ind_test = cleaner.clean(dirty_train, dirty_test)
- 
+
         # save clean train and test data
         clean_path_pfx = os.path.join(save_dir, clean_method)
         utils.save_dfs(clean_train, clean_test, clean_path_pfx, version)
@@ -46,9 +45,10 @@ def clean_error(dataset, error):
         ind_path_pfx = os.path.join(save_dir, 'indicator_{}'.format(clean_method))
         utils.save_dfs(ind_train, ind_test, ind_path_pfx)
 
+
 def clean(dataset, error_type=None):
     """ Clean each error in the dataset.
-    
+
     Args:
         dataset (dict): dataset dict in dataset.py
     """
