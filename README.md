@@ -16,6 +16,9 @@ source venv/bin/activate
 pip install -U pip
 
 pip install -r requirements.txt
+
+# Example: Run experiments and analysis for USCensus dataset on missing values only
+python main.py --run_experiments --dataset USCensus --error_type missing_values --run_analysis
 ```
 
 ### Run Experiments

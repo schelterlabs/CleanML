@@ -1,4 +1,6 @@
 """Define the domain of dataset"""
+import operator
+
 
 # details of each dataset
 KDD = {
@@ -54,13 +56,14 @@ EEG = {
 
 USCensus = {
     "data_dir": "USCensus",
-    "error_types": ["missing_values"],
+    "error_types": ["missing_values", "outliers", "mislabel"],
+    "drop_variables": ["Age", "Race", "Sex"],
     "label": 'Income',
     "ml_task": "classification",
-    "privileged_groups": {
-        "Race": " white",
-        "Sex": " male"
-    }
+    "privileged_groups": [
+        ("Race", operator.eq, " white"),
+        ("Sex", operator.eq, " male"),
+    ],
 }
 
 Restaurant = {
@@ -76,10 +79,14 @@ Restaurant = {
 Credit = {
     "data_dir": "Credit",
     "error_types": ["outliers", "missing_values"],
+    "drop_variables": ["age"],
     "label": "SeriousDlqin2yrs",
     "categorical_variables":["SeriousDlqin2yrs"],
     "ml_task": "classification",
-    "class_imbalance":True
+    "class_imbalance":True,
+    "privileged_groups": [
+        ("age", operator.gt, 30),
+    ],
 }
 
 Sensor = {
@@ -260,10 +267,49 @@ Credit_minor = {
     "class_imbalance":True
 }
 
-# domain of dataset 
+ACSIncome = {
+    "data_dir": "ACSIncome",
+    "error_types": ["missing_values", "outliers", "mislabel"],
+    "drop_variables": ["AGEP", "SEX", "RAC1P"],
+    "label": "label",
+    "categorical_variables": ["COW", "SCHL", "MAR", "OCCP", "POBP", "RELP", "SEX", "RAC1P"],
+    "ml_task": "classification",
+    "class_imbalance": True,
+    "privileged_groups": [
+        ("RAC1P", operator.eq, "1"),
+        ("SEX", operator.eq, "1"),
+    ],
+}
+
+Cardio = {
+    "data_dir": "Cardio",
+    "error_types": ["outliers", "mislabel"],
+    "drop_variables": ["age", "gender"],
+    "label": "cardio",
+    "ml_task": "classification",
+    # "class_imbalance": ?,
+    "privileged_groups": [
+        ("gender", operator.eq, 2),
+    ],
+}
+
+GermanCredit = {
+    "data_dir": "GermanCredit",
+    "error_types": ["missing_values", "outliers", "mislabel"],
+    "drop_variables": ["age", "personal_status"],
+    "label": "credit",
+    "ml_task": "classification",
+    # "class_imbalance": ?,
+    "privileged_groups": [
+        ("age", operator.gt, 25),
+    ],
+}
+
+# domain of dataset
 datasets = [KDD, Credit, Airbnb, USCensus, EEG, Titanic, 
             Marketing, Sensor, Movie, Restaurant, Citation, 
             Company, University, KDD_uniform, KDD_minor, KDD_major,
             USCensus_uniform, USCensus_major, USCensus_minor,
             EEG_uniform, EEG_minor, EEG_major, Titanic_uniform, Titanic_minor, Titanic_major,
-            Marketing_uniform, Marketing_major, Marketing_minor, Credit_uniform, Credit_major, Credit_minor]
+            Marketing_uniform, Marketing_major, Marketing_minor, Credit_uniform, Credit_major, Credit_minor,
+            ACSIncome, Cardio, GermanCredit]

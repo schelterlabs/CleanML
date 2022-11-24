@@ -188,7 +188,7 @@ def mixed_f1_acc(dataset_name, error_type, test_file):
     if error_type == 'mislabel':
         dataset_name = dataset_name.split('_')[0]
     dataset = utils.get_dataset(dataset_name)
-    if ('class_imbalance' in dataset.keys() and dataset['class_imbalance']):
+    if dataset.get('class_imbalance'):
         metric = test_file + "_test_f1"
     else:
         metric = test_file + "_test_acc"
