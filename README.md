@@ -14,6 +14,10 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -U pip
 pip install -r requirements.txt
+
+# Note: You may need to run the last line like so,
+# due to recent incompatibility issues between setuptools and numpy
+SETUPTOOLS_USE_DISTUTILS=stdlib pip install -r requirements.txt
 ```
 
 ## Run Experiments
