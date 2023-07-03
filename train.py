@@ -71,8 +71,8 @@ def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_
             test_f1 = f1_score(y_test, y_pred)
             result[file + "_test_f1"] = test_f1
 
-    for group in test_group_memberships.keys():
-        for X_test, y_test, file, priv_idx in zip(X_test_list, y_test_list, test_files, test_group_memberships[group]):
+    for attr in test_group_memberships:
+        for X_test, y_test, file, (test_case_idx, priv_idx) in zip(X_test_list, y_test_list, test_files, enumerate(test_group_memberships[attr])):
 
             # Indexes for disadvantaged group
             dis_idx = np.logical_not(priv_idx)
@@ -81,14 +81,34 @@ def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_
             priv_tn, priv_fp, priv_fn, priv_tp = confusion_matrix(y_test[priv_idx], y_pred[priv_idx]).ravel()
             dis_tn, dis_fp, dis_fn, dis_tp = confusion_matrix(y_test[dis_idx], y_pred[dis_idx]).ravel()
 
-            result[file + f"__{group.lower()}_priv__tn"] = int(priv_tn)
-            result[file + f"__{group.lower()}_priv__fp"] = int(priv_fp)
-            result[file + f"__{group.lower()}_priv__fn"] = int(priv_fn)
-            result[file + f"__{group.lower()}_priv__tp"] = int(priv_tp)
-            result[file + f"__{group.lower()}_dis__tn"] = int(dis_tn)
-            result[file + f"__{group.lower()}_dis__fp"] = int(dis_fp)
-            result[file + f"__{group.lower()}_dis__fn"] = int(dis_fn)
-            result[file + f"__{group.lower()}_dis__tp"] = int(dis_tp)
+            result[file + f"__{attr.lower()}_priv__tn"] = int(priv_tn)
+            result[file + f"__{attr.lower()}_priv__fp"] = int(priv_fp)
+            result[file + f"__{attr.lower()}_priv__fn"] = int(priv_fn)
+            result[file + f"__{attr.lower()}_priv__tp"] = int(priv_tp)
+            result[file + f"__{attr.lower()}_dis__tn"] = int(dis_tn)
+            result[file + f"__{attr.lower()}_dis__fp"] = int(dis_fp)
+            result[file + f"__{attr.lower()}_dis__fn"] = int(dis_fn)
+            result[file + f"__{attr.lower()}_dis__tp"] = int(dis_tp)
+
+        for attr2 in test_group_memberships:
+            if attr == attr2:
+                continue
+
+            for test_case_idx2, priv_idx2 in enumerate(test_group_memberships[attr2]):
+                if test_case_idx != test_case_idx2:
+                    continue
+
+                dis_idx2 = np.logical_not(priv_idx2)
+
+                # Indexes and counts for four intersectional groups
+                priv_priv_idx = np.logical_and(priv_idx, priv_idx2)
+                priv_priv_count = priv_priv_idx.sum()
+                priv_dis_idx = np.logical_and(priv_idx, dis_idx2)
+                priv_dis_count = priv_dis_idx.sum()
+                dis_priv_idx = np.logical_and(dis_idx, priv_idx2)
+                dis_priv_count = dis_priv_idx.sum()
+                dis_dis_idx = np.logical_and(dis_idx, dis_idx2)
+                dis_dis_count = dis_dis_idx.sum()
 
     return result
 
