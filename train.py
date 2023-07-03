@@ -90,14 +90,11 @@ def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_
             result[file + f"__{attr.lower()}_dis__fn"] = int(dis_fn)
             result[file + f"__{attr.lower()}_dis__tp"] = int(dis_tp)
 
-        for attr2 in test_group_memberships:
-            if attr == attr2:
-                continue
-
-            for test_case_idx2, priv_idx2 in enumerate(test_group_memberships[attr2]):
-                if test_case_idx != test_case_idx2:
+            for attr2 in test_group_memberships:
+                if attr == attr2:
                     continue
 
+                priv_idx2 = test_group_memberships[attr2][test_case_idx]
                 dis_idx2 = np.logical_not(priv_idx2)
 
                 # Indexes and counts for four intersectional groups
@@ -109,6 +106,36 @@ def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_
                 dis_priv_count = dis_priv_idx.sum()
                 dis_dis_idx = np.logical_and(dis_idx, dis_idx2)
                 dis_dis_count = dis_dis_idx.sum()
+
+                # Four confusion matrices
+                priv_priv_tn, priv_priv_fp, priv_priv_fn, priv_priv_tp = confusion_matrix(y_test[priv_priv_idx], y_pred[priv_priv_idx]).ravel()
+                priv_dis_tn, priv_dis_fp, priv_dis_fn, priv_dis_tp = confusion_matrix(y_test[priv_dis_idx], y_pred[priv_dis_idx]).ravel()
+                dis_priv_tn, dis_priv_fp, dis_priv_fn, dis_priv_tp = confusion_matrix(y_test[dis_priv_idx], y_pred[dis_priv_idx]).ravel()
+                dis_dis_tn, dis_dis_fp, dis_dis_fn, dis_dis_tp = confusion_matrix(y_test[dis_dis_idx], y_pred[dis_dis_idx]).ravel()
+
+                result[file + f"__{attr.lower()}_priv__{attr2.lower()}_priv__tn"] = int(priv_priv_tn)
+                result[file + f"__{attr.lower()}_priv__{attr2.lower()}_priv__fp"] = int(priv_priv_fp)
+                result[file + f"__{attr.lower()}_priv__{attr2.lower()}_priv__fn"] = int(priv_priv_fn)
+                result[file + f"__{attr.lower()}_priv__{attr2.lower()}_priv__tp"] = int(priv_priv_tp)
+                result[file + f"__{attr.lower()}_priv__{attr2.lower()}_priv__count"] = int(priv_priv_count)
+
+                result[file + f"__{attr.lower()}_priv__{attr2.lower()}_dis__tn"] = int(priv_dis_tn)
+                result[file + f"__{attr.lower()}_priv__{attr2.lower()}_dis__fp"] = int(priv_dis_fp)
+                result[file + f"__{attr.lower()}_priv__{attr2.lower()}_dis__fn"] = int(priv_dis_fn)
+                result[file + f"__{attr.lower()}_priv__{attr2.lower()}_dis__tp"] = int(priv_dis_tp)
+                result[file + f"__{attr.lower()}_priv__{attr2.lower()}_dis__count"] = int(priv_dis_count)
+
+                result[file + f"__{attr.lower()}_dis__{attr2.lower()}_priv__tn"] = int(dis_priv_tn)
+                result[file + f"__{attr.lower()}_dis__{attr2.lower()}_priv__fp"] = int(dis_priv_fp)
+                result[file + f"__{attr.lower()}_dis__{attr2.lower()}_priv__fn"] = int(dis_priv_fn)
+                result[file + f"__{attr.lower()}_dis__{attr2.lower()}_priv__tp"] = int(dis_priv_tp)
+                result[file + f"__{attr.lower()}_dis__{attr2.lower()}_priv__count"] = int(dis_priv_count)
+
+                result[file + f"__{attr.lower()}_dis__{attr2.lower()}_dis__tn"] = int(dis_dis_tn)
+                result[file + f"__{attr.lower()}_dis__{attr2.lower()}_dis__fp"] = int(dis_dis_fp)
+                result[file + f"__{attr.lower()}_dis__{attr2.lower()}_dis__fn"] = int(dis_dis_fn)
+                result[file + f"__{attr.lower()}_dis__{attr2.lower()}_dis__tp"] = int(dis_dis_tp)
+                result[file + f"__{attr.lower()}_dis__{attr2.lower()}_dis__count"] = int(dis_dis_count)
 
     return result
 
