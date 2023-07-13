@@ -290,18 +290,23 @@ Cardio = {
     # "class_imbalance": ?,
     "privileged_groups": [
         ("gender", operator.eq, 2),
+        ("age", operator.gt, 45*365.25),  # TODO: Rerun experiments with 55
     ],
 }
 
 GermanCredit = {
     "data_dir": "GermanCredit",
     "error_types": ["missing_values", "outliers", "mislabel"],
-    "drop_variables": ["age", "personal_status"],
+    "drop_variables": ["age", "personal_status", "sex"],
     "label": "credit",
     "ml_task": "classification",
     # "class_imbalance": ?,
     "privileged_groups": [
         ("age", operator.gt, 25),
+        ("sex", operator.eq, "male"),  # this was added to the raw dataset as 'male'
+                                       # if 'personal_status' is in ['A91', 'A93', 'A94']
+                                       # else 'female'
+        ("foreign_worker", operator.eq, "A202"),
     ],
 }
 
