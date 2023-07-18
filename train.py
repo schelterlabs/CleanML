@@ -78,8 +78,16 @@ def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_
             dis_idx = np.logical_not(priv_idx)
             y_pred = best_model.predict(X_test)
 
-            priv_tn, priv_fp, priv_fn, priv_tp = confusion_matrix(y_test[priv_idx], y_pred[priv_idx]).ravel()
-            dis_tn, dis_fp, dis_fn, dis_tp = confusion_matrix(y_test[dis_idx], y_pred[dis_idx]).ravel()
+            priv_tn, priv_fp, priv_fn, priv_tp = confusion_matrix(
+                y_test[priv_idx],
+                y_pred[priv_idx],
+                labels=[0, 1],
+            ).ravel()
+            dis_tn, dis_fp, dis_fn, dis_tp = confusion_matrix(
+                y_test[dis_idx],
+                y_pred[dis_idx],
+                labels=[0, 1],
+            ).ravel()
 
             result[file + f"__{attr.lower()}_priv__tn"] = int(priv_tn)
             result[file + f"__{attr.lower()}_priv__fp"] = int(priv_fp)
@@ -109,7 +117,11 @@ def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_
 
                 # Four confusion matrices
                 if priv_priv_count:
-                    priv_priv_tn, priv_priv_fp, priv_priv_fn, priv_priv_tp = confusion_matrix(y_test[priv_priv_idx], y_pred[priv_priv_idx]).ravel()
+                    priv_priv_tn, priv_priv_fp, priv_priv_fn, priv_priv_tp = confusion_matrix(
+                        y_test[priv_priv_idx],
+                        y_pred[priv_priv_idx],
+                        labels=[0, 1],
+                    ).ravel()
 
                     result[file + f"__{attr.lower()}_priv__{attr2.lower()}_priv__tn"] = int(priv_priv_tn)
                     result[file + f"__{attr.lower()}_priv__{attr2.lower()}_priv__fp"] = int(priv_priv_fp)
@@ -118,7 +130,11 @@ def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_
                     result[file + f"__{attr.lower()}_priv__{attr2.lower()}_priv__count"] = int(priv_priv_count)
 
                 if priv_dis_count:
-                    priv_dis_tn, priv_dis_fp, priv_dis_fn, priv_dis_tp = confusion_matrix(y_test[priv_dis_idx], y_pred[priv_dis_idx]).ravel()
+                    priv_dis_tn, priv_dis_fp, priv_dis_fn, priv_dis_tp = confusion_matrix(
+                        y_test[priv_dis_idx],
+                        y_pred[priv_dis_idx],
+                        labels=[0, 1],
+                    ).ravel()
 
                     result[file + f"__{attr.lower()}_priv__{attr2.lower()}_dis__tn"] = int(priv_dis_tn)
                     result[file + f"__{attr.lower()}_priv__{attr2.lower()}_dis__fp"] = int(priv_dis_fp)
@@ -127,7 +143,11 @@ def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_
                     result[file + f"__{attr.lower()}_priv__{attr2.lower()}_dis__count"] = int(priv_dis_count)
 
                 if dis_priv_count:
-                    dis_priv_tn, dis_priv_fp, dis_priv_fn, dis_priv_tp = confusion_matrix(y_test[dis_priv_idx], y_pred[dis_priv_idx]).ravel()
+                    dis_priv_tn, dis_priv_fp, dis_priv_fn, dis_priv_tp = confusion_matrix(
+                        y_test[dis_priv_idx],
+                        y_pred[dis_priv_idx],
+                        labels=[0, 1],
+                    ).ravel()
 
                     result[file + f"__{attr.lower()}_dis__{attr2.lower()}_priv__tn"] = int(dis_priv_tn)
                     result[file + f"__{attr.lower()}_dis__{attr2.lower()}_priv__fp"] = int(dis_priv_fp)
@@ -136,7 +156,11 @@ def evaluate(best_model, X_test_list, y_test_list, test_group_memberships, test_
                     result[file + f"__{attr.lower()}_dis__{attr2.lower()}_priv__count"] = int(dis_priv_count)
 
                 if dis_dis_count:
-                    dis_dis_tn, dis_dis_fp, dis_dis_fn, dis_dis_tp = confusion_matrix(y_test[dis_dis_idx], y_pred[dis_dis_idx]).ravel()
+                    dis_dis_tn, dis_dis_fp, dis_dis_fn, dis_dis_tp = confusion_matrix(
+                        y_test[dis_dis_idx],
+                        y_pred[dis_dis_idx],
+                        labels=[0, 1],
+                    ).ravel()
 
                     result[file + f"__{attr.lower()}_dis__{attr2.lower()}_dis__tn"] = int(dis_dis_tn)
                     result[file + f"__{attr.lower()}_dis__{attr2.lower()}_dis__fp"] = int(dis_dis_fp)
