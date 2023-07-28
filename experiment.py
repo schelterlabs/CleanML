@@ -12,7 +12,7 @@ from train import train_and_evaluate
 import utils
 
 
-def one_search_experiment(dataset, error_type, train_file, model, seed, n_jobs=1, hyperparams=None, skip_test_files=[]):
+def one_search_experiment(dataset, error_type, train_file, model, seed, n_jobs=1):
     """One experiment on the datase given an error type, a train file, a model and a random search seed
         
     Args:
@@ -32,7 +32,7 @@ def one_search_experiment(dataset, error_type, train_file, model, seed, n_jobs=1
 
     # train and evaluate
     result = train_and_evaluate(X_train, y_train, X_test_list, y_test_list, test_group_memberships,
-                                test_files, model, n_jobs=n_jobs, seed=train_seed, hyperparams=hyperparams)
+                                test_files, model, n_jobs=n_jobs, seed=train_seed)
     return result
 
 
@@ -52,7 +52,6 @@ def one_split_experiment(dataset, log=False, n_retrain=5, seed=1, n_jobs=1, nosa
 
     # load result dict
     result = utils.load_result(dataset['data_dir'])
-    result2019 = utils.load_result2019(dataset['data_dir'])
 
     # run experiments
     for error in dataset["error_types"]:
@@ -69,20 +68,12 @@ def one_split_experiment(dataset, log=False, n_retrain=5, seed=1, n_jobs=1, nosa
                         print("Ignore experiment {} that has been completed before.".format(key))
                         continue
 
-                    if key in result2019.keys():
-                        hyperparams = result2019[key]["best_params"]
-                        skip_test_files = [k.rstrip("_test_acc") for k in result2019[key].keys() if "_test_acc" in k]
-                        assert False
-                    else:
-                        hyperparams = None
-                        skip_test_files = []
-
                     start_time = datetime.datetime.now()
                     print("{} Processing {}".format(start_time, key))
                     if log:
                         logging.debug("{} Processing {}".format(start_time, key))
 
-                    res = one_search_experiment(dataset, error, train_file, model, seed, n_jobs=n_jobs, hyperparams=hyperparams, skip_test_files=skip_test_files)
+                    res = one_search_experiment(dataset, error, train_file, model, seed, n_jobs=n_jobs)
 
                     end_time = datetime.datetime.now()
                     print("{} Finished {}".format(end_time, key))
@@ -93,9 +84,6 @@ def one_split_experiment(dataset, log=False, n_retrain=5, seed=1, n_jobs=1, nosa
                     if log:
                         logging.debug("{} Finished {}".format(end_time, key))
                         logging.debug("Finished in {} minutes {} seconds".format(minutes, seconds))
-
-                    if key in result2019.keys():
-                        res = {**result2019[key], **res}
 
                     if not nosave:
                         utils.save_result(dataset['data_dir'], key, res)

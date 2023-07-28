@@ -184,41 +184,6 @@ def get_train_files(error_type):
         filenames = list(error_dict["clean_methods"].keys())
     else:
         filenames = ["dirty"] + list(error_dict["clean_methods"].keys())
-
-    # if error_type == 'missing_values':
-    #     filenames = [
-    #                 "delete", 
-    #                 "impute_holoclean",
-    #                 "impute_mean_mode", 
-    #                 "impute_mean_dummy", 
-    #                 "impute_median_mode", 
-    #                 "impute_median_dummy", 
-    #                 "impute_mode_mode", 
-    #                 "impute_mode_dummy"]
-    # elif error_type == 'outliers':
-    #     filenames = ["dirty", 
-    #                  "clean_HC_impute_holoclean",
-    #                  "clean_SD_delete", 
-    #                  "clean_IF_delete", 
-    #                  "clean_IQR_delete", 
-    #                  "clean_SD_impute_mean_dummy", 
-    #                  "clean_IQR_impute_mean_dummy", 
-    #                  "clean_IF_impute_mean_dummy", 
-    #                  "clean_SD_impute_median_dummy",
-    #                  "clean_IQR_impute_median_dummy", 
-    #                  "clean_IF_impute_median_dummy",
-    #                  "clean_SD_impute_mode_dummy",
-    #                  "clean_IQR_impute_mode_dummy", 
-    #                  "clean_IF_impute_mode_dummy"]
-    # elif error_type == 'mislabel':
-    #     filenames = ["dirty",
-    #                  "clean"]
-    # elif error_type == 'duplicates':
-    #     filenames = ["dirty", "clean", "AutoER"]
-    # elif error_type == "inconsistency":
-    #     filenames = ["dirty", "clean", "FD"]
-    # else:
-    #     filenames = ["dirty", "clean"]
     return filenames
 
 
@@ -284,34 +249,6 @@ def load_result(dataset_name=None, parse_key=False):
         result_path = [os.path.join(config.result_dir, file) for file in files]
     else:
         result_path = [os.path.join(config.result_dir, '{}_result.json'.format(dataset_name))]
-
-    result = {}
-    for path in result_path:
-        if os.path.exists(path):
-            result.update(json.load(open(path, 'r')))
-
-    if parse_key:
-        new_result = {}
-        for key, value in result.items():
-            new_key = tuple(key.split('/'))
-            new_result[new_key] = value
-        result = new_result
-
-    return result
-
-
-def load_result2019(dataset_name=None, parse_key=False):
-    """Load result of one dataset or all datasets (if no argument) from json to dict
-
-    Args:
-        dataset_name (string): dataset name. If not specified, load results of all datasets.
-        parse_key (bool): whether convert key from string to tuple
-    """
-    if dataset_name is None:
-        files = [file for file in os.listdir(config.result_dir) if file.endswith('_result.json')]
-        result_path = [os.path.join("result2019", file) for file in files]
-    else:
-        result_path = [os.path.join("result2019", '{}_result.json'.format(dataset_name))]
 
     result = {}
     for path in result_path:
