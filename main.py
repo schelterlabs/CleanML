@@ -1,10 +1,12 @@
 """Main function"""
 
-import utils
 import argparse
+import sys
+
 import config
 from experiment import experiment
 from relation import populate
+import utils
 
 
 def _parse_args():
@@ -23,6 +25,11 @@ def _parse_args():
 
 
 def main():
+    # Check Python version
+    # Pinned dependency versions verified only with 3.6 or 3.7
+    assert sys.version_info[0] == 3 and sys.version_info[1] in [6, 7], (
+        f"Python 3.6 or 3.7 required instead of {sys.version.split(' ')[0]}")
+
     args = _parse_args()
 
     # run experiments on datasets
