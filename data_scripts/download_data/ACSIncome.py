@@ -14,6 +14,7 @@ import numpy as np
 
 from folktables import ACSDataSource
 
+
 os.makedirs("data/ACSIncome/raw", exist_ok=True)
 
 data_source = ACSDataSource(survey_year="2018", horizon="1-Year", survey="person")
