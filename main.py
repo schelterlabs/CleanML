@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+import warnings
 
 import config
 from experiment import experiment
@@ -30,18 +31,22 @@ def main():
     assert sys.version_info[0] == 3 and sys.version_info[1] in [6, 7], (
         f"Python 3.6 or 3.7 required instead of {sys.version.split(' ')[0]}")
 
-    args = _parse_args()
+    # Suppress annoying warnings that are due to pinning old versions of libraries
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
 
-    # run experiments on datasets
-    if args.run_experiments:
-        print("=== Running experiments ===")
-        datasets = [utils.get_dataset(args.dataset)] if args.dataset is not None else config.datasets
-        experiment(datasets, args.log, args.cpu, args.nosave, args.error_type, args.seeds)
+        args = _parse_args()
 
-    # run analysis on results
-    if args.run_analysis:
-        print("=== Running analysis ===")
-        populate([args.alpha])
+        # run experiments on datasets
+        if args.run_experiments:
+            print("=== Running experiments ===")
+            datasets = [utils.get_dataset(args.dataset)] if args.dataset is not None else config.datasets
+            experiment(datasets, args.log, args.cpu, args.nosave, args.error_type, args.seeds)
+
+        # run analysis on results
+        if args.run_analysis:
+            print("=== Running analysis ===")
+            populate([args.alpha])
 
     print("Done")
 
