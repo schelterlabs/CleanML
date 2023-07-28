@@ -30,8 +30,6 @@ def one_search_experiment(dataset, error_type, train_file, model, seed, n_jobs=1
     X_train, y_train, X_test_list, y_test_list, test_group_memberships, test_files = \
         preprocess(dataset, error_type, train_file, normalize=True, down_sample_seed=down_sample_seed)
 
-    test_files = list(set(test_files).difference(set(skip_test_files)))
-
     # train and evaluate
     result = train_and_evaluate(X_train, y_train, X_test_list, y_test_list, test_group_memberships,
                                 test_files, model, n_jobs=n_jobs, seed=train_seed, hyperparams=hyperparams)
@@ -74,6 +72,7 @@ def one_split_experiment(dataset, log=False, n_retrain=5, seed=1, n_jobs=1, nosa
                     if key in result2019.keys():
                         hyperparams = result2019[key]["best_params"]
                         skip_test_files = [k.rstrip("_test_acc") for k in result2019[key].keys() if "_test_acc" in k]
+                        assert False
                     else:
                         hyperparams = None
                         skip_test_files = []
