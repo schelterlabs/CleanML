@@ -7,6 +7,10 @@ The codebase is located in: https://github.com/chu-data-lab/CleanML
 The details of the benchmark methodology and design are described in the paper:
 > CleanML: A Benchmark for Joint Data Cleaning and Machine Learning [Experiments and Analysis]
 
+## Requirements
+
+This project has been tested with Python 3.6 and Python 3.7.
+
 ## Install
 
 ```shell
@@ -14,10 +18,6 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -U pip
 pip install -r requirements.txt
-
-# Note: You may need to run the last line like so,
-# due to recent incompatibility issues between setuptools and numpy
-SETUPTOOLS_USE_DISTUTILS=stdlib pip install -r requirements.txt
 ```
 
 ## Run Experiments
