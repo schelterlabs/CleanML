@@ -297,7 +297,7 @@ Cardio = {
 GermanCredit = {
     "data_dir": "GermanCredit",
     "error_types": ["missing_values", "outliers", "mislabel"],
-    "drop_variables": ["age", "personal_status", "sex"],
+    "drop_variables": ["age", "personal_status", "sex", "foreign_worker"],
     "label": "credit",
     "ml_task": "classification",
     # "class_imbalance": ?,
