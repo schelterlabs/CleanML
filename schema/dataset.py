@@ -311,4 +311,4 @@ GermanCredit = {
 }
 
 # domain of dataset
-datasets = [USCensus, ACSIncome, Cardio, GermanCredit]
+datasets = [USCensus, ACSIncome, Credit, Cardio, GermanCredit]
